@@ -7,20 +7,35 @@ BACKGROUND_COLOR = "#B1DDC6"
 data = pandas.read_csv("data/french_words.csv")
 toLearn = data.to_dict(orient="records")
 
+currentCard = {}
+
 
 def nextCard():
+    global currentCard, flipTimer
+    window.after_cancel(flipTimer)
     currentCard = random.choice(toLearn)
-    canvas.itemconfig(cardTitle, text="French")
-    canvas.itemconfig(cardWord, text=currentCard["French"])
+    canvas.itemconfig(cardTitle, text="French", fill="black")
+    canvas.itemconfig(cardWord, text=currentCard["French"], fill="black")
+    canvas.itemconfig(cardBackground, image=cardFrontImage)
+    window.after(3000, func=flipCard)
+
+
+def flipCard():
+    canvas.itemconfig(cardTitle, text="English", fill="white")
+    canvas.itemconfig(cardWord, text=currentCard["English"], fill="white")
+    canvas.itemconfig(cardBackground, image=cardBackImage)
 
 
 window = Tk()
 window.title("Translate Flashcard")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 
+flipTimer = window.after(3000, func=flipCard)
+
 canvas = Canvas(width=800, height=536)
 cardFrontImage = PhotoImage(file="images/card_front.png")
-canvas.create_image(400, 263, image=cardFrontImage)
+cardBackImage = PhotoImage(file="images/card_back.png")
+cardBackground = canvas.create_image(400, 263, image=cardFrontImage)
 cardTitle = canvas.create_text(400, 150, font=("Ariel", 40, "italic"))
 cardWord = canvas.create_text(400, 263, font=("Ariel", 60, "bold"))
 canvas.config(bg=BACKGROUND_COLOR, highlightthickness=0)
